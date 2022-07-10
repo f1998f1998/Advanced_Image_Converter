@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.conversions.ConversionsFragment">
+
+
+    <TextView
+        android:id="@+id/TotalText"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="350dp"
+        android:text="Total:"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/convertedText"
+        app:layout_constraintEnd_toStartOf="@+id/total"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/total"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="350dp"
+        android:text="1000"
+        android:textAlignment="center"
+
+        app:layout_constraintBottom_toTopOf="@+id/converted"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/TotalText"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/convertedText"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="Converted"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/remainingText"
+        app:layout_constraintEnd_toStartOf="@+id/converted"
+        app:layout_constraintHorizontal_bias="0.5"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TotalText" />
+
+    <TextView
+        android:id="@+id/converted"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="500"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/remaining"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/convertedText"
+        app:layout_constraintTop_toBottomOf="@+id/total" />
+
+    <TextView
+        android:id="@+id/remainingText"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="Remaining:"
+        android:textAlignment="center"
+
+        app:layout_constraintEnd_toStartOf="@+id/remaining"
+        app:layout_constraintHorizontal_bias="0.5"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/convertedText" />
+
+    <TextView
+        android:id="@+id/remaining"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:text="500"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/remainingText"
+        app:layout_constraintTop_toBottomOf="@+id/converted" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/total"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="183dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

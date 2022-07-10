@@ -4,14 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.aic.advancedimageconverter.databinding.FragmentNotificationsBinding
+import com.aic.advancedimageconverter.databinding.FragmentConversionsBinding
 
 class ConversionsFragment : Fragment() {
 
-    private var _binding: FragmentNotificationsBinding? = null
+    private var _binding: FragmentConversionsBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -22,16 +21,22 @@ class ConversionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val conversionsViewModel =
-            ViewModelProvider(this).get(ConversionsViewModel::class.java)
+        val conversionsViewModel = ConversionsViewModel.instance!!
 
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        _binding = FragmentConversionsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textNotifications
-        conversionsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        conversionsViewModel.total.observe(viewLifecycleOwner) {
+            binding.total.text = it.toString()
+            binding.progressBar.max = it
         }
+        conversionsViewModel.done.observe(viewLifecycleOwner) {
+            binding.converted.text = it.toString()
+            binding.remaining.text = (conversionsViewModel.total.value!! - it).toString()
+            binding.progressBar.progress = it
+        }
+
+
         return root
     }
 
