@@ -28,6 +28,9 @@ data class ImageConversion(
     var conversionJob: Deferred<ImageResult>? = null
         private set
 
+    var isSuccessful = false
+        private set
+
     fun setJob(job: Deferred<ImageResult>) {
         conversionJob = job
     }
@@ -41,6 +44,40 @@ data class ImageConversion(
             )
             if (!newFile.exists()) image.copyTo(newFile)
         }
+
+    }
+
+    fun setProcessing() {
+        status = Processing()
+    }
+
+    fun setWaiting() {
+        status = Waiting()
+    }
+
+    fun setDone() {
+        status = Done()
+    }
+
+    fun setSuccessful() {
+        isSuccessful = true
+    }
+
+
+    fun convert(bitmap: Bitmap) {
+        setProcessing()
+
+        convertedImage.outputStream().use { out ->
+            bitmap.compress(
+                targetFormat,
+                quality,
+                out
+            )
+        }
+
+        setDone()
+        setSuccessful()
+
 
     }
 

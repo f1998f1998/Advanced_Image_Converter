@@ -3,7 +3,6 @@ package com.aic.advancedimageconverter.ui.conversions
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,10 +15,6 @@ import java.io.File
 
 class ConversionsViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
-    }
-    val text: LiveData<String> = _text
 
     val imageLoad by lazy { ImageLoad.instance!! }
 
@@ -29,57 +24,40 @@ class ConversionsViewModel : ViewModel() {
 
     val quality = 100
 
-    val conversions = mutableSetOf<ImageConversion>()
-
     val total = MutableLiveData(0)
 
     val done = MutableLiveData(0)
 
     private var job: Job? = null
 
-    fun add(image: File) {
-        conversions.add(ImageConversion(image, targetFormat, tpath, quality))
-        total.value = conversions.size
-    }
-
     fun convert(context: Context?) {
         val path = context?.getExternalFilesDir("images")!!
         tpath = context.getExternalFilesDir("converted")!!
-        path.mkdirs()
-        tpath.mkdirs()
-        path.listFiles()?.map { add(it) }
-        if (job == null || job?.isCancelled == true || job?.isCompleted == true) job =
-            conversions.asFlow()
-                .flatMapMerge(8) { imageConversion->
+        if (job == null || job?.isCancelled == true || job?.isCompleted == true)
+            job = flow {
+                path.mkdirs()
+                tpath.mkdirs()
+                total.value = path.listFiles()?.map { emit(it) }?.size ?: 0
+            }.map { file -> ImageConversion(file, targetFormat, tpath, quality) }
+
+                .flatMapMerge(8) { imageConversion ->
                     flow {
-                        if (imageConversion.convertedImage.exists()) return@flow emit(true to imageConversion)
-                        imageConversion.status = ImageConversion.Processing()
+                        if (imageConversion.convertedImage.exists())
+                            return@flow emit(imageConversion.apply { setSuccessful() })
+
                         imageLoad.execute(imageConversion.request).drawable
                             ?.let {
+                                val bitmap = (it as BitmapDrawable).bitmap
+                                imageConversion.convert(bitmap)
+                            }
+                        imageConversion.deleteIfBigger()
+                        emit(imageConversion)
+                    }.flowOn(Dispatchers.Default)
+                }
 
-                                val bitmap =
-                                    (it as BitmapDrawable).bitmap
-                                imageConversion.convertedImage.outputStream().use { out ->
-                                    bitmap.compress(
-                                        imageConversion.targetFormat,
-                                        imageConversion.quality,
-                                        out
-                                    )
-                                }
-                                imageConversion.status = ImageConversion.Done()
-                                emit(true to imageConversion)
-
-                            } ?: emit(false to imageConversion)
-                    }
-                        .map { (isSuccess, imageConv) ->
-                            imageConv.deleteIfBigger()
-                            isSuccess
-                        }.flowOn(Dispatchers.Default)
-                        .onEach { isSuccess ->
-                            if (isSuccess) done.value = (done.value!! + 1)
-                        }
-                        .flowOn(Dispatchers.Main)
-                }.launchIn(this.viewModelScope)
+                .onEach { if (it.isSuccessful) done.value = (done.value!! + 1) }
+                .flowOn(Dispatchers.Main)
+                .launchIn(this.viewModelScope)
 
     }
 
@@ -87,7 +65,6 @@ class ConversionsViewModel : ViewModel() {
         job?.cancel()
         total.value = 0
         done.value = 0
-        conversions.clear()
     }
 
     companion object {
