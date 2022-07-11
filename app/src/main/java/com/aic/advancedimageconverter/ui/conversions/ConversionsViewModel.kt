@@ -50,15 +50,11 @@ class ConversionsViewModel : ViewModel() {
         path.listFiles()?.map { add(it) }
         if (job == null || job?.isCancelled == true || job?.isCompleted == true) job =
             conversions.asFlow()
-                .map {
-                    it to if (!it.convertedImage.exists()) imageLoad.execute(it.request).drawable
-                    else null
-                }
-                .flatMapMerge(8) { (imageConversion, it) ->
+                .flatMapMerge(8) { imageConversion->
                     flow {
                         if (imageConversion.convertedImage.exists()) return@flow emit(true to imageConversion)
                         imageConversion.status = ImageConversion.Processing()
-                        it
+                        imageLoad.execute(imageConversion.request).drawable
                             ?.let {
 
                                 val bitmap =

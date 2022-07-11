@@ -3,6 +3,7 @@ package com.aic.advancedimageconverter.ui
 import android.graphics.Bitmap
 import coil.request.ImageRequest
 import coil.request.ImageResult
+import coil.size.Precision
 import com.aic.advancedimageconverter.ImageLoad
 import kotlinx.coroutines.Deferred
 import java.io.File
@@ -21,6 +22,7 @@ data class ImageConversion(
 
     var status: Status = Waiting()
     val request = ImageRequest.Builder(ImageLoad.context!!)
+        .precision(Precision.EXACT)
         .data(image)
         .build()
     var conversionJob: Deferred<ImageResult>? = null
